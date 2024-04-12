@@ -33,7 +33,7 @@ class Employee:
 
     @employee_id.setter
     def employee_id(self, employee_id):
-        if isinstance(employee_id, int) and len(employee_id) is 7:
+        if isinstance(employee_id, int) and len(str(employee_id)) == 7:
             self._employee_id = employee_id
         else:
             raise ValueError("Employee ID must be a 7 digit integer.")
@@ -45,7 +45,7 @@ class Employee:
     ### This could use some sort of validation to determine if the entered value is a valid email, and also not in use ###
 
     @contact_information.setter
-    def contact_setter(self, contact_information):
+    def contact_information(self, contact_information):
         if isinstance(contact_information, str):
             self._contact_information = contact_information
         else:
@@ -86,7 +86,7 @@ class Employee:
             INSERT INTO employees (name, employee_id, contact_information, access_level)
             VALUES (?, ?, ?, ?)
         """
-        CURSOR.execute(sql)
+        CURSOR.execute(sql, (self.name, self.employee_id, self.contact_information, self.access_level))
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
@@ -166,16 +166,17 @@ class Employee:
             FROM employees
             WHERE employee_id is ?
         """
-        row = CURSOR.execute(sql, (employee_id,)).fetchone()
-        return cls.instance_from_db(row) if row else None
+        obj = CURSOR.execute(sql, (employee_id,)).fetchone()
+        #return cls.instance_from_db(row) if row else None
+        return obj
     
     def tickets(self):
         from models.ticket import Ticket
         sql = """
-            SELECT * FROM employees
-            WHERE employee_id = ?
+            SELECT * FROM ticketsx
+            WHERE employee = ?
         """
-        CURSOR.execute(sql, (self.employee_id,),)
+        CURSOR.execute(sql, (self.id,),)
         rows = CURSOR.fetchall()
         return [
             Ticket.instance_from_db(row) for row in rows

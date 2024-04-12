@@ -22,7 +22,7 @@ class Ticket:
     
     @ticket_number.setter
     def ticket_number(self, ticket_number):
-        if isinstance(ticket_number, str) and len(ticket_number) is 10 and ticket_number[0] is "Z":
+        if isinstance(ticket_number, str) and len(ticket_number) == 10 and ticket_number[0] == "Z":
             self._ticket_number = ticket_number
         else:
             raise ValueError("Ticket number must be a 10 character string with the first character being Z.")
@@ -63,13 +63,14 @@ class Ticket:
     @classmethod
     def create_table(cls):
         sql = """
-            CREATE TABLE IF NOT EXISTS tickets
+            CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY,
+            ticket_number STR,
             employee INT,
-            FOREIGN KEY (employee) REFERENCES employees(id),
             issue INT,
-            FOREIGN KEY (issuew) REFERENCES issues(id),
-            timestamp STR)
+            timestamp STR,
+            FOREIGN KEY (employee) REFERENCES employees(id),
+            FOREIGN KEY (issue) REFERENCES issues(id))
         """
         CURSOR.execute(sql)
         CONN.commit()
@@ -84,10 +85,10 @@ class Ticket:
 
     def save(self):
         sql = """
-            INSERT INTO tickets (employee, issue, timestamp)
-            VALUES (?, ?, ?)
+            INSERT INTO tickets (ticket_number, employee, issue, timestamp)
+            VALUES (?, ?, ?, ?)
         """
-        CURSOR.execute(sql, (self.employee, self.issue, self.timestamp))
+        CURSOR.execute(sql, (self.ticket_number, self.employee, self.issue, self.timestamp))
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
@@ -95,16 +96,16 @@ class Ticket:
     def update(self):
         sql = """
             UPDATE tickets
-            SET employee = ?, issue = ?, timestamp = ?
+            SET ticket_number = ?, employee = ?, issue = ?, timestamp = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.employee, self.issue, self.timestamp, self.id))
+        CURSOR.execute(sql, (self.ticket_number, self.employee, self.issue, self.timestamp, self.id))
         CONN.commit()
 
     def delete(self):
         sql = """
             DELETE FROM tickets
-            WHERE is = ?
+            WHERE id = ?
         """
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
@@ -112,8 +113,8 @@ class Ticket:
         self.id = None
 
     @classmethod
-    def create(cls, employee, issue, timestamp):
-        ticket = cls(employee, issue, timestamp)
+    def create(cls, ticket_number, employee, issue, timestamp):
+        ticket = cls(ticket_number, employee, issue, timestamp)
         ticket.save()
         return ticket
     
@@ -121,11 +122,12 @@ class Ticket:
     def instance_from_db(cls, row):
         ticket = cls.all.get(row[0])
         if ticket:
-            ticket.employee = row[1]
-            ticket.issue = row[2]
-            ticket.timestamp = row[3]
+            ticket.ticket_number = row[1]
+            ticket.employee = row[2]
+            ticket.issue = row[3]
+            ticket.timestamp = row[4]
         else:
-            ticket = cls(row[1], row[2], row[3])
+            ticket = cls(row[1], row[2], row[3], row[4])
             ticket.id = row[0]
             cls.all[ticket.id] = ticket
         return ticket
@@ -140,7 +142,7 @@ class Ticket:
         return [cls.instance_from_db(row) for row in rows]
     
     @classmethod
-    def find_by_id(cls):
+    def find_by_id(cls, id):
         sql = """
             SELECT *
             FROM tickets
@@ -150,21 +152,21 @@ class Ticket:
         return cls.instance_from_db(row) if row else None
     
     @classmethod
-    def find_by_employee(cls):
+    def find_by_employee(cls, employee):
         sql = """
             SELECT *
             FROM tickets
             WHERE employee is ?
         """
-        row = CURSOR.execute(sql, (id,)).fetchone()
+        row = CURSOR.execute(sql, (employee,)).fetchone()
         return cls.instance_from_db(row) if row else None
 
     @classmethod
-    def find_by_issue(cls):
+    def find_by_ticket_number(cls, ticket):
         sql = """
             SELECT *
             FROM tickets
-            WHERE issue is ?
+            WHERE ticket_number is ?
         """
-        row = CURSOR.execute(sql, (id,)).fetchone()
+        row = CURSOR.execute(sql, (ticket,)).fetchone()
         return cls.instance_from_db(row) if row else None

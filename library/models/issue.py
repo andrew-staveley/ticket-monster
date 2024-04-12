@@ -22,7 +22,7 @@ class Issue:
 
     @issue_code.setter
     def issue_code(self, issue_code):
-        if isinstance(issue_code, int) and len(issue_code) is 3:
+        if isinstance(issue_code, int) and len(str(issue_code)) == 3:
             self._issue_code = issue_code
         else:
             raise ValueError("Issue Code must be a 3 digit integer")
@@ -33,7 +33,7 @@ class Issue:
     
     @sub_cat.setter
     def sub_cat(self, sub_cat):
-        if isinstance(sub_cat, str) and sub_cat is "hardware" or "software" or "permissions" or "other":
+        if isinstance(sub_cat, str) and sub_cat == "hardware" or "software" or "permissions" or "other":
             self._sub_cat = sub_cat
         else:
             raise ValueError("Sub-Category must be 'hardware', 'software', 'permissions', or 'other'.")
@@ -63,7 +63,7 @@ class Issue:
     @classmethod
     def create_table(cls):
         sql = """
-            CREATE TABLE IF NOT EXISTS tickets (
+            CREATE TABLE IF NOT EXISTS issues (
             id INTEGER PRIMARY KEY,
             issue_code INTEGER,
             sub_cat TEXT,
@@ -76,14 +76,14 @@ class Issue:
     @classmethod
     def drop_table(cls):
         sql = """
-            DROP TABLE IF EXISTS tickets
+            DROP TABLE IF EXISTS issues
         """
         CURSOR.execute(sql)
-        CONN.execute()
+        CONN.commit()
 
     def save(self):
         sql = """
-            INSERT INTO tickets (issue_code, sub_cat, issue_desc, process_time)
+            INSERT INTO issues (issue_code, sub_cat, issue_desc, process_time)
             VALUES (?, ?, ?, ?)
         """
         CURSOR.execute(sql, (self.issue_code, self.sub_cat, self.issue_desc, self.process_time))
@@ -99,7 +99,7 @@ class Issue:
     
     def update(self):
         sql = """
-            UPDATE tickets
+            UPDATE issues
             SET issue_code = ?, sub_cat = ?, issue_desc = ?, process_time = ?
             WHERE id = ?
         """
@@ -108,7 +108,7 @@ class Issue:
 
     def delete(self):
         sql = """
-            DELETE FROM tickets
+            DELETE FROM issues
             WHERE id = ?
         """
         CURSOR.execute(sql, (self.id,))
@@ -118,23 +118,23 @@ class Issue:
 
     @classmethod
     def instance_from_db(cls, row):
-        ticket = cls.all.get(row[0])
-        if ticket:
-            ticket.issue_code = row[1]
-            ticket.sub_cat = row[2]
-            ticket.issue_desc = row[3]
-            ticket.process_time = row[4]
+        issue = cls.all.get(row[0])
+        if issue:
+            issue.issue_code = row[1]
+            issue.sub_cat = row[2]
+            issue.issue_desc = row[3]
+            issue.process_time = row[4]
         else:
-            ticket = cls(row[1], row[2], row[3], row[4])
-            ticket.id = row[0]
-            cls.all[ticket.id] = ticket
-        return ticket
+            issue = cls(row[1], row[2], row[3], row[4])
+            issue.id = row[0]
+            cls.all[issue.id] = issue
+        return issue
     
     @classmethod
     def get_all(cls):
         sql = """
             SELECT *
-            FROM tickets
+            FROM issues
         """
         rows = CURSOR.execute(sql).fetchall()
         return [cls.instance_from_db(row) for row in rows]
@@ -143,7 +143,7 @@ class Issue:
     def find_by_id(cls, id):
         sql = """
             SELECT *
-            FROM tickets
+            FROM issues
             WHERE id = ?
         """
         row = CURSOR.execute(sql, (id,)).fetchone()
@@ -153,7 +153,7 @@ class Issue:
     def find_by_issue_code(cls, issue_code):
         sql = """
             SELECT *
-            FROM tickets
+            FROM issues
             WHERE issue_code = ?
         """
         row = CURSOR.execute(sql, (issue_code,)).fetchone()
@@ -163,7 +163,7 @@ class Issue:
     def find_by_sub_category(cls, sub_cat):
         sql = """
             SELECT *
-            FROM tickets
+            FROM issues
             WHERE sub_cat = ?
         """
         rows = CURSOR.execute(sql, (sub_cat,)).fetchall()
