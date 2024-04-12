@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 ipdb = "*"
+faker = "*"
 
 [dev-packages]
 
