@@ -16,14 +16,14 @@ def seed_database():
     Issue.create_table()
     Ticket.create_table()
 
-    employee_one = Employee.create("ADMIN TEST", 1111111, "admin", "admin@company.com")
-    employee_two = Employee.create("USER TEST", 2222222, "user", "user@company.com")
-    employee_three = Employee.create(fake.name(), en_generator(), "user", fake.email())
-    employee_four = Employee.create(fake.name(), en_generator(), "user", fake.email())
-    employee_five = Employee.create(fake.name(), en_generator(), "user", fake.email())
-    Employee.create(fake.name(), en_generator(), "user", fake.email())
-    Employee.create(fake.name(), en_generator(), "user", fake.email())
-    Employee.create(fake.name(), en_generator(), "user", fake.email())
+    employee_one = Employee.create("ADMIN TEST", 1111111, "admin@company.com", "admin")
+    employee_two = Employee.create("USER TEST", 2222222, "user@company.com", "user")
+    employee_three = Employee.create(fake.name(), en_generator(), fake.email(), "user")
+    employee_four = Employee.create(fake.name(), en_generator(), fake.email(), "user")
+    employee_five = Employee.create(fake.name(), en_generator(), fake.email(), "user")
+    Employee.create(fake.name(), en_generator(), fake.email(), "user")
+    Employee.create(fake.name(), en_generator(), fake.email(), "user")
+    Employee.create(fake.name(), en_generator(), fake.email(), "user")
 
 
 
