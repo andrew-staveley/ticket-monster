@@ -111,7 +111,7 @@ class Employee:
             DELETE FROM employees
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.id))
+        CURSOR.execute(sql, (self.id,))
         CONN.commit()
         del type(self).all[self.id]
         self.id = None
@@ -166,9 +166,8 @@ class Employee:
             FROM employees
             WHERE employee_id is ?
         """
-        obj = CURSOR.execute(sql, (employee_id,)).fetchone()
-        #return cls.instance_from_db(row) if row else None
-        return obj
+        row = CURSOR.execute(sql, (employee_id,)).fetchone()
+        return cls.instance_from_db(row) if row else None
     
     def tickets(self):
         from models.ticket import Ticket
