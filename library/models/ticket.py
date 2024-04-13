@@ -158,8 +158,8 @@ class Ticket:
             FROM tickets
             WHERE employee is ?
         """
-        row = CURSOR.execute(sql, (employee,)).fetchone()
-        return cls.instance_from_db(row) if row else None
+        rows = CURSOR.execute(sql, (employee,)).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
 
     @classmethod
     def find_by_ticket_number(cls, ticket):
