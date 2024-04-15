@@ -36,7 +36,7 @@ def seed_database():
     issue_seven = Issue.create(301, "permissions", "Password needs to be reset.", 1)
     issue_eight = Issue.create(302, "permissions", "Change from 'user' to 'admin'.", 1)
     issue_nine = Issue.create(303, "permissions", "No access to software.", 1)
-    issue_ten = Issue.create(401, "other", "Wifi is broken inside office.", 5)
+    issue_ten = Issue.create(401, "other", "Computer fell into lake while working from 'home'", 5)
 
     Ticket.create(tn_generator(), employee_one.id, issue_one.id, str(datetime.datetime.now()))
     Ticket.create(tn_generator(), employee_two.id, issue_two.id, str(datetime.datetime.now()))
