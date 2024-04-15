@@ -164,8 +164,14 @@ def ticket_subcat_menu(employee_info):
     print("3. Permissions")
     print("4. Other")
     choice = input("> ")
+    subcat = None
     if choice == "0":
-        pass
+        if employee_info.access_level == "admin":
+            admin_home(employee_info)
+        elif employee_info.access_level == "user":
+            user_home(employee_info)
+        else:
+            error_screen("An internal error occurred. Please try again later.")
     elif choice == "1":
         subcat = "hardware"
     elif choice == "2":
@@ -173,7 +179,7 @@ def ticket_subcat_menu(employee_info):
     elif choice == "3":
         subcat = "permissions"
     elif choice == "4":
-        subcat == "other"
+        subcat = "other"
     else:
         error_screen("Invalid Input")
     new_ticket(employee_info, subcat)
