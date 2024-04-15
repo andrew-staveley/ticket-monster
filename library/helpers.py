@@ -65,19 +65,18 @@ def tn_generator():
     else:
         return tn_generator()
 
-def new_ticket(employee):
+def new_ticket(employee, subcat):
     sweep_up_shop()
-    employee_number = employee.id
-    timestamp = str(datetime.datetime.now())
-    issues = Issue.get_all()
-    print("Enter a number not being used to create a new issue.")
+    issues = Issue.find_by_sub_category(subcat)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Press enter to make a new issue code.")
     for issue in issues:
         print(f"Code: {issue.issue_code} ; {issue.issue_desc}")
-    selection = input("Please select an issue code: ")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    selection = input("Please enter an issue code: ")
     if selection := Issue.find_by_issue_code(selection):
         try:
-            new_ticket = Ticket.create(tn_generator(), employee_number, selection.id, timestamp)
-            sweep_up_shop()
+            new_ticket = Ticket.create(tn_generator(), employee.id, selection.id, str(datetime.datetime.now()))
             new_object = f"""Please retain this information.\n
 Employee: {employee.name}\n
 Ticket Number: {new_ticket.ticket_number}\n
@@ -94,7 +93,7 @@ Processing time is approx. {selection.process_time} days."""
         print("Y / N")
         choice = input("> ")
         if choice == "y":
-            pass
+            new_issue(employee, subcat)
         elif choice == "n":
             pass
         else:
@@ -170,7 +169,7 @@ def admin_view_all_tickets():
         print(f"Ticket Number: {ticket.ticket_number}")
         print(f"Employee: {employee.name}")
         print(f"Employee Contact: {employee.contact_information}")
-        print(f"Code: {issue.issue_code}")
+        print(f"Issue Code: {issue.issue_code}")
         print(f"{issue.issue_desc}")
         print(f"Posted @ {ticket.timestamp}")
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -314,3 +313,105 @@ def edit_tickets_by_ticket_no():
         error_screen("Ticket not found.")
     else:
         admin_edit_ticket(ticket_instance)
+
+def new_issue(employee, subcat):
+    sweep_up_shop()
+    issue_instances = Issue.find_by_sub_category(subcat)
+    new_issue_code = issue_instances[-1].issue_code + 1
+    if Issue.find_by_issue_code(new_issue_code) == None:
+        print("Please enter a description of the issue.")
+        issue_desc = input("> ")
+        if employee.access_level == "admin":
+            print("Please enter a number to represent the amount of days until completion.")
+            time = input("> ")
+        else:
+            time = 0
+        try:
+            Issue.create(new_issue_code, subcat, issue_desc, int(time))
+            success_screen(f"Issue {new_issue_code} has been created!\nPlease be aware that if a ticket was trying to be created, it will have to be resubmitted with the new issue code.")
+        except Exception as exc:
+            error_screen(exc)
+    else:
+        error_screen("Internal Error, Please try again later.")
+
+def edit_issue():
+    sweep_up_shop()
+    issues = Issue.get_all()
+    for issue in issues:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(f"Issue Code: {issue.issue_code}")
+        print(f"Sub-Category: {issue.sub_cat}")
+        print(f"{issue.issue_desc}")
+        print(f"Processing time is {issue.process_time} days.")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("End of List")
+    print("")
+    print("Enter an item code to edit, or press enter to exit.")
+    choice = input("> ")
+    if choice == "":
+        pass
+    else:
+        fetched_issue = Issue.find_by_issue_code(choice)
+        if fetched_issue:
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print(f"Issue Code: {fetched_issue.issue_code}")
+            print(f"Sub-Category: {fetched_issue.sub_cat}")
+            print(f"{fetched_issue.issue_desc}")
+            print(f"Processing time is {fetched_issue.process_time} days.")
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            try:
+                fetched_issue.issue_code = fetched_issue.issue_code
+                fetched_issue.sub_cat = fetched_issue.sub_cat
+                desc = input("Please enter a new description (leave blank to skip): ")
+                if desc == "":
+                    fetched_issue.issue_desc = fetched_issue.issue_desc
+                else:
+                    fetched_issue.issue_desc = desc
+                time = input("Please enter a processing time in days: ")
+                fetched_issue.process_time = int(time)
+                fetched_issue.update()
+                success_screen(f"Issue {fetched_issue.issue_code} has been updated!")
+            except Exception as exc:
+                error_screen(exc)
+        else:
+            error_screen("Issue Code not Found")
+
+def remove_issue():
+    sweep_up_shop()
+    issues = Issue.get_all()
+    for issue in issues:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(f"Issue Code: {issue.issue_code}")
+        print(f"Sub-Category: {issue.sub_cat}")
+        print(f"{issue.issue_desc}")
+        print(f"Processing time is {issue.process_time} days.")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("End of List")
+    print("")
+    print("Enter an item code to delete, or press enter to exit.")
+    choice = input("> ")
+    if choice == "":
+        pass
+    elif issue_to_delete := Issue.find_by_issue_code(choice):
+        try:
+            issue_to_delete.delete()
+            success_screen(f"Issue {choice} has been deleted!")
+        except Exception as exc:
+            error_screen(exc)
+    else:
+        error_screen("Issue code not found.")
+
+def view_issues():
+    sweep_up_shop()
+    issues = Issue.get_all()
+    for issue in issues:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(f"Issue Code: {issue.issue_code}")
+        print(f"Sub-Category: {issue.sub_cat}")
+        print(f"{issue.issue_desc}")
+        print(f"Processing time is {issue.process_time} days.")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("End of List")
+    print("")
+    print("Press Enter to Continue")
+    input("> ")
