@@ -353,6 +353,7 @@ def edit_issue():
     else:
         fetched_issue = Issue.find_by_issue_code(choice)
         if fetched_issue:
+            sweep_up_shop()
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print(f"Issue Code: {fetched_issue.issue_code}")
             print(f"Sub-Category: {fetched_issue.sub_cat}")
@@ -388,7 +389,7 @@ def remove_issue():
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("End of List")
     print("")
-    print("Enter an item code to delete, or press enter to exit.")
+    print("Enter an issue code to delete, or press enter to exit.")
     choice = input("> ")
     if choice == "":
         pass
