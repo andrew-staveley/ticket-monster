@@ -207,4 +207,3 @@ def new_issue_subcat_menu(employee_info):
 
 if __name__ == "__main__":
     login()
-
