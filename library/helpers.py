@@ -236,6 +236,8 @@ def create_employee():
 
 def edit_employee():
     sweep_up_shop()
+    employee_list()
+    print("")
     employee_to_edit = input("Please enter the employee ID to edit: ")
     employee_instance = Employee.find_by_employee_id(employee_to_edit)
     if employee_instance == None:
@@ -262,6 +264,8 @@ def edit_employee():
 
 def delete_employee():
     sweep_up_shop()
+    employee_list()
+    print("")
     employee_to_delete = input("Please enter the employee ID to remove: ")
     employee_instance = Employee.find_by_employee_id(employee_to_delete)
     if employee_instance == None:
@@ -416,3 +420,11 @@ def view_issues():
     print("")
     print("Press Enter to Continue")
     input("> ")
+
+def employee_list():
+    sweep_up_shop()
+    employees = Employee.get_all()
+    print(("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"))
+    for employee in employees:
+        print(f"{employee.name} <{employee.employee_id}>")
+    print(("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"))

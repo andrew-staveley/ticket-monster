@@ -22,7 +22,7 @@ from helpers import (
 def login():
     while True:
         sweep_up_shop()
-        print("Welcome to Ticket Tracker")
+        print("Welcome to Ticket Monster")
         print("Please enter your employee ID to continue.")
         print("If you wish to exit, press enter.")
         employee_login = input("> ")
