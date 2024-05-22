@@ -18,8 +18,6 @@ class Issue:
     def issue_code(self):
         return self._issue_code
     
-    ### Needs to verify that the issue code doesn't already exist ###
-
     @issue_code.setter
     def issue_code(self, issue_code):
         if isinstance(issue_code, int) and len(str(issue_code)) == 3:
