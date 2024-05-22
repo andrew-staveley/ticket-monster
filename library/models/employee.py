@@ -4,15 +4,15 @@ class Employee:
 
     all = {}
 
-    def __init__(self, name, employee_id, contact_information, access_level, id=None):
+    def __init__(self, name, employee_number, contact_information, access_level, id=None):
         self.id = id
         self.name = name
-        self.employee_id = employee_id
+        self.employee_number = employee_number
         self.contact_information = contact_information
         self.access_level = access_level
 
     def __repr__(self):
-        return f'<Employee {self.id}: {self.name} {self.contact_information}, Employee ID: {self.employee_id} Access Level: {self.access_level}>'
+        return f'<Employee {self.id}: {self.name} {self.contact_information}, Employee ID: {self.employee_number} Access Level: {self.access_level}>'
     
     @property
     def name(self):
@@ -26,15 +26,13 @@ class Employee:
             raise ValueError("Name must be a non-empty string.")
         
     @property
-    def employee_id(self):
-        return self._employee_id
+    def employee_number(self):
+        return self._employee_number
 
-    ### This also needs to verify that the employee ID that was entered isn't already in use. ###
-
-    @employee_id.setter
-    def employee_id(self, employee_id):
-        if isinstance(employee_id, int) and len(str(employee_id)) == 7:
-            self._employee_id = employee_id
+    @employee_number.setter
+    def employee_number(self, employee_number):
+        if isinstance(employee_number, int) and len(str(employee_number)) == 7:
+            self._employee_number = employee_number
         else:
             raise ValueError("Employee ID must be a 7 digit integer.")
         
@@ -42,8 +40,6 @@ class Employee:
     def contact_information(self):
         return self._contact_information
     
-    ### This could use some sort of validation to determine if the entered value is a valid email, and also not in use ###
-
     @contact_information.setter
     def contact_information(self, contact_information):
         if isinstance(contact_information, str):
@@ -68,7 +64,7 @@ class Employee:
             CREATE TABLE IF NOT EXISTS employees (
             id INTEGER PRIMARY KEY,
             name TEXT,
-            employee_id INT,
+            employee_number INT,
             contact_information TEXT,
             access_level TEXT)
         """
@@ -83,27 +79,27 @@ class Employee:
 
     def save(self):
         sql = """
-            INSERT INTO employees (name, employee_id, contact_information, access_level)
+            INSERT INTO employees (name, employee_number, contact_information, access_level)
             VALUES (?, ?, ?, ?)
         """
-        CURSOR.execute(sql, (self.name, self.employee_id, self.contact_information, self.access_level))
+        CURSOR.execute(sql, (self.name, self.employee_number, self.contact_information, self.access_level))
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
 
     @classmethod
-    def create(cls, name, employee_id, contact_information, access_level):
-        employee = cls(name, employee_id, contact_information, access_level)
+    def create(cls, name, employee_number, contact_information, access_level):
+        employee = cls(name, employee_number, contact_information, access_level)
         employee.save()
         return employee
     
     def update(self):
         sql = """
             UPDATE employees
-            SET name = ?, employee_id = ?, contact_information = ?, access_level = ?
+            SET name = ?, employee_number = ?, contact_information = ?, access_level = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.name, self.employee_id, self.contact_information, self.access_level, self.id))
+        CURSOR.execute(sql, (self.name, self.employee_number, self.contact_information, self.access_level, self.id))
         CONN.commit()
 
     def delete(self):
@@ -121,7 +117,7 @@ class Employee:
         employee = cls.all.get(row[0])
         if employee:
             employee.name = row[1]
-            employee.employee_id = row[2]
+            employee.employee_number = row[2]
             employee.contact_information = row[3]
             employee.access_level = row[4]
         else:
@@ -160,19 +156,19 @@ class Employee:
         return cls.instance_from_db(row) if row else None
     
     @classmethod
-    def find_by_employee_id(cls, employee_id):
+    def find_by_employee_number(cls, employee_number):
         sql = """
             SELECT *
             FROM employees
-            WHERE employee_id is ?
+            WHERE employee_number is ?
         """
-        row = CURSOR.execute(sql, (employee_id,)).fetchone()
+        row = CURSOR.execute(sql, (employee_number,)).fetchone()
         return cls.instance_from_db(row) if row else None
     
     def tickets(self):
         from models.ticket import Ticket
         sql = """
-            SELECT * FROM ticketsx
+            SELECT * FROM tickets
             WHERE employee = ?
         """
         CURSOR.execute(sql, (self.id,),)

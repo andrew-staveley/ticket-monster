@@ -41,7 +41,7 @@ def en_generator():
     current_employees = Employee.get_all()
     booleanval = True
     for current_employee in current_employees:
-        if current_employee.employee_id == new_employee_number:
+        if current_employee.employee_number == new_employee_number:
             booleanval = False
         else:
             pass
@@ -218,7 +218,7 @@ def admin_edit_ticket(ticket):
 def create_employee():
     sweep_up_shop()
     name = input("Please enter name: ")
-    employee_id = en_generator()
+    employee_number = en_generator()
     contact = input("Please enter employee email: ")
     print("Please add employee permissions. Enter a for admin and u for user.")
     permissions = input("> ")
@@ -229,7 +229,7 @@ def create_employee():
     else:
         error_screen("Invalid input.")
     try:
-        new_employee = Employee.create(name, employee_id, contact, access_level)
+        new_employee = Employee.create(name, employee_number, contact, access_level)
         success_screen(f"{new_employee.name} has been added!")
     except Exception as exc:
         error_screen(exc)
@@ -238,10 +238,10 @@ def edit_employee():
     sweep_up_shop()
     employee_list()
     print("")
-    employee_to_edit = input("Please enter the employee ID to edit: ")
-    employee_instance = Employee.find_by_employee_id(employee_to_edit)
+    employee_to_edit = input("Please enter the employee number to edit: ")
+    employee_instance = Employee.find_by_employee_number(employee_to_edit)
     if employee_instance == None:
-        error_screen("Employee ID not found.")
+        error_screen("Employee number not found.")
     else:
         try:
             sweep_up_shop()
@@ -266,26 +266,27 @@ def delete_employee():
     sweep_up_shop()
     employee_list()
     print("")
-    employee_to_delete = input("Please enter the employee ID to remove: ")
-    employee_instance = Employee.find_by_employee_id(employee_to_delete)
+    employee_to_delete = input("Please enter the employee number to remove: ")
+    employee_instance = Employee.find_by_employee_number(employee_to_delete)
     if employee_instance == None:
-        error_screen("Employee ID not found.")
+        error_screen("Employee number not found.")
     else:
+        employee_tickets = employee_instance.tickets()
+        for ticket in employee_tickets:
+            ticket.delete()
         employee_instance.delete()
-        success_screen(f"{employee_instance.name} has been removed!")
+        success_screen(f"{employee_instance.name} & associated tickets have been removed!")
 
 def edit_tickets_by_employee_id():
     sweep_up_shop()
-    print("Please enter the 7 digit employee ID:")
-    employee_id = input("> ")
-    employee = Employee.find_by_employee_id(employee_id)
-    ticket_instances = Ticket.find_by_employee(employee.id)
+    print("Please enter the 7 digit employee number:")
+    employee = Employee.find_by_employee_number(input("> "))
     if employee == None:
         error_screen("Employee not found.")
     else:
         sweep_up_shop()
         print(f"Showing All Tickets for {employee.name}")
-        for ticket in ticket_instances:
+        for ticket in employee.tickets():
             issue = Issue.find_by_id(ticket.issue)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print(f"Ticket Number: {ticket.ticket_number}")
@@ -426,5 +427,5 @@ def employee_list():
     employees = Employee.get_all()
     print(("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"))
     for employee in employees:
-        print(f"{employee.name} <{employee.employee_id}>")
+        print(f"{employee.name} <{employee.employee_number}>")
     print(("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"))

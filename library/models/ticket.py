@@ -14,7 +14,7 @@ class Ticket:
         self.timestamp = timestamp
 
     def __repr__(self):
-        return f'<Ticket No.: {self.ticket_number} Posted By: {self.employee_id} Issue Code: {self.issue_code} ; {self.extra} @ {self.timestamp}>'
+        return f'<Ticket No.: {self.ticket_number} Posted By: {self.employee} Issue Code: {self.issue_code} ; {self.extra} @ {self.timestamp}>'
     
     @property
     def ticket_number(self):

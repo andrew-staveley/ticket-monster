@@ -29,7 +29,7 @@ def login():
         if employee_login == "":
             exit_program()
         else:
-            employee = Employee.find_by_employee_id(int(employee_login))
+            employee = Employee.find_by_employee_number(int(employee_login))
             permissions = None
             if employee:
                 permissions = employee.access_level
@@ -48,10 +48,10 @@ def login_menu():
     print("Please enter your employee ID to continue.")
     print("If you wish to exit, press enter.")
 
-def admin_home(employee_info):
+def admin_home(employee):
     while True:
         sweep_up_shop()
-        print(f"Welcome Admin: {employee_info.name}")
+        print(f"Welcome Admin: {employee.name}")
         print("What would you like to do today?")
         print("Please enter a number to continue")
         print("0. Logout")
@@ -62,18 +62,18 @@ def admin_home(employee_info):
         if choice == "0":
             login()
         elif choice == "1":
-            ticket_search(employee_info)
+            ticket_search(employee)
         elif choice == "2":
-            edit_employees(employee_info)
+            edit_employees(employee)
         elif choice == "3":
-            edit_issues(employee_info)
+            edit_issues(employee)
         else:
             error_screen("Invalid Input")
 
-def user_home(employee_info):
+def user_home(employee):
     while True:
         sweep_up_shop()
-        print(f"Welcome User: {employee_info.name}")
+        print(f"Welcome User: {employee.name}")
         print("What would you like to do today?")
         print("Please enter a number to continue")
         print("0. Logout")
@@ -83,13 +83,13 @@ def user_home(employee_info):
         if choice == "0":
             login()
         elif choice == "1":
-            ticket_subcat_menu(employee_info)
+            ticket_subcat_menu(employee)
         elif choice == "2":
-            user_view_tickets(employee_info)
+            user_view_tickets(employee)
         else:
             error_screen("Invalid Input")
 
-def ticket_search(employee_info):
+def ticket_search(employee):
     while True:
         sweep_up_shop()
         print("How would you like to locate a ticket?")
@@ -100,7 +100,7 @@ def ticket_search(employee_info):
         print("4. Open New Ticket")
         choice = input("> ")
         if choice == "0":
-            admin_home(employee_info)
+            admin_home(employee)
         elif choice == "1":
             edit_tickets_by_employee_id()
         elif choice == "2":
@@ -108,11 +108,11 @@ def ticket_search(employee_info):
         elif choice == "3":
             admin_view_all_tickets()
         elif choice == "4":
-            ticket_subcat_menu(employee_info)
+            ticket_subcat_menu(employee)
         else:
             error_screen("Invalid Input")
 
-def edit_employees(employee_info):
+def edit_employees(employee):
     while True:
         sweep_up_shop()
         print("What would you like to change today?")
@@ -122,7 +122,7 @@ def edit_employees(employee_info):
         print("3. Terminate Employee")
         choice = input("> ")
         if choice == "0":
-            admin_home(employee_info)
+            admin_home(employee)
         elif choice == "1":
             create_employee()
         elif choice == "2":
@@ -132,7 +132,7 @@ def edit_employees(employee_info):
         else:
             error_screen("Invalid Input")
 
-def edit_issues(employee_info):
+def edit_issues(employee):
     while True:
         sweep_up_shop()
         print("What would you like to do today?")
@@ -143,9 +143,9 @@ def edit_issues(employee_info):
         print("4. View Current Issues")
         choice = input("> ")
         if choice == "0":
-            admin_home(employee_info)
+            admin_home(employee)
         elif choice == "1":
-            new_issue_subcat_menu(employee_info)
+            new_issue_subcat_menu(employee)
         elif choice == "2":
             edit_issue()
         elif choice == "3":
@@ -155,7 +155,7 @@ def edit_issues(employee_info):
         else:
             error_screen("Invalid Input")
 
-def ticket_subcat_menu(employee_info):
+def ticket_subcat_menu(employee):
     sweep_up_shop()
     print("What is the nature of your issue?")
     print("0. Back")
@@ -166,10 +166,10 @@ def ticket_subcat_menu(employee_info):
     choice = input("> ")
     subcat = None
     if choice == "0":
-        if employee_info.access_level == "admin":
-            admin_home(employee_info)
-        elif employee_info.access_level == "user":
-            user_home(employee_info)
+        if employee.access_level == "admin":
+            admin_home(employee)
+        elif employee.access_level == "user":
+            user_home(employee)
         else:
             error_screen("An internal error occurred. Please try again later.")
     elif choice == "1":
@@ -182,9 +182,9 @@ def ticket_subcat_menu(employee_info):
         subcat = "other"
     else:
         error_screen("Invalid Input")
-    new_ticket(employee_info, subcat)
+    new_ticket(employee, subcat)
 
-def new_issue_subcat_menu(employee_info):
+def new_issue_subcat_menu(employee):
     sweep_up_shop()
     print("Creating New Issue, Please Select an Option")
     print("1. Hardware Issue")
@@ -203,7 +203,7 @@ def new_issue_subcat_menu(employee_info):
         subcat = "other"
     else:
         error_screen("Invalid Input")
-    new_issue(employee_info, subcat)
+    new_issue(employee, subcat)
 
 if __name__ == "__main__":
     login()
