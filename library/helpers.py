@@ -230,7 +230,7 @@ def create_employee():
         error_screen("Invalid input.")
     try:
         new_employee = Employee.create(name, employee_number, contact, access_level)
-        success_screen(f"{new_employee.name} has been added!")
+        success_screen(f"{new_employee.name} has been added!\nEmployee Number: {new_employee.employee_number}")
     except Exception as exc:
         error_screen(exc)
 
@@ -400,8 +400,11 @@ def remove_issue():
         pass
     elif issue_to_delete := Issue.find_by_issue_code(choice):
         try:
+            assoc_tickets = issue_to_delete.tickets()
+            for ticket in assoc_tickets:
+                ticket.delete()
             issue_to_delete.delete()
-            success_screen(f"Issue {choice} has been deleted!")
+            success_screen(f"Issue {choice} & associated tickets have been removed!")
         except Exception as exc:
             error_screen(exc)
     else:

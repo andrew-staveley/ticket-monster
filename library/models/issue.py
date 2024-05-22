@@ -168,3 +168,15 @@ class Issue:
         """
         rows = CURSOR.execute(sql, (sub_cat,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    
+    def tickets(self):
+        from models.ticket import Ticket
+        sql = """
+            SELECT * FROM tickets
+            WHERE issue = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        rows = CURSOR.fetchall()
+        return [
+            Ticket.instance_from_db(row) for row in rows
+        ]
